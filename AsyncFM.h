@@ -220,7 +220,7 @@ void AsyncFMClass::handleUpload(AsyncWebServerRequest* request, String filename,
 
 String AsyncFMClass::list()
 {
-    File root = FILESYSTEM.open("/");
+    File root = SPIFFS.open("/");
     File file = root.openNextFile();
     String ret = "<table><tr><th align='left'>Name</th><th align='left'>Size</th><th></th><th></th></tr>";
     while (file) {
