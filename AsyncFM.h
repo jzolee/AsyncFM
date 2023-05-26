@@ -6,8 +6,6 @@
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
 
-#define FILESYSTEM SPIFFS
-
 // https://github.com/smford/esp32-asyncwebserver-fileupload-example
 
 const char AsyncFM_html[] PROGMEM = R"rawliteral(
@@ -149,7 +147,7 @@ void AsyncFMClass::begin(AsyncWebServer* server, const char* username, const cha
     _server->on("/fm_list", HTTP_GET, [&](AsyncWebServerRequest* request) { request->send(200, "text/plain", list()); });
 
     _server->on("/fm_format", HTTP_GET, [&](AsyncWebServerRequest* request) {
-        if (FILESYSTEM.format())
+        if (SPIFFS.format())
             request->send(200, "text/plain", "Format complete");
         else
             request->send(400, "text/plain", "ERROR: formatting failed!");
@@ -161,16 +159,16 @@ void AsyncFMClass::begin(AsyncWebServer* server, const char* username, const cha
             if (!fileName.startsWith("/"))
                 fileName = "/" + fileName;
             const char* action = request->getParam("action")->value().c_str();
-            if (!FILESYSTEM.exists(fileName)) {
+            if (!SPIFFS.exists(fileName)) {
                 request->send(400, "text/plain", "ERROR: file does not exist");
             } else {
                 if (strcmp(action, "download") == 0) {
-                    request->send(FILESYSTEM, fileName, "application/octet-stream");
+                    request->send(SPIFFS, fileName, "application/octet-stream");
                 } else if (strcmp(action, "delete") == 0) {
-                    FILESYSTEM.remove(fileName);
+                    SPIFFS.remove(fileName);
                     request->send(200, "text/plain", "Deleted File: " + String(fileName));
                 } else if (strcmp(action, "stream") == 0) {
-                    request->send(FILESYSTEM, fileName, "text/plain");
+                    request->send(SPIFFS, fileName, "text/plain");
                 } else {
                     request->send(400, "text/plain", "ERROR: invalid action param supplied");
                 }
@@ -192,13 +190,13 @@ String AsyncFMClass::humanReadableSize(const size_t bytes)
 String AsyncFMClass::processor(const String& var)
 {
     if (var == "FREE")
-        return humanReadableSize((FILESYSTEM.totalBytes() - FILESYSTEM.usedBytes()));
+        return humanReadableSize((SPIFFS.totalBytes() - SPIFFS.usedBytes()));
 
     if (var == "USED")
-        return humanReadableSize(FILESYSTEM.usedBytes());
+        return humanReadableSize(SPIFFS.usedBytes());
 
     if (var == "TOTAL")
-        return humanReadableSize(FILESYSTEM.totalBytes());
+        return humanReadableSize(SPIFFS.totalBytes());
 
     return String();
 }
@@ -207,7 +205,7 @@ void AsyncFMClass::handleUpload(AsyncWebServerRequest* request, String filename,
 {
     if (!index) {
         // open the file on first call and store the file handle in the request object
-        request->_tempFile = FILESYSTEM.open("/" + filename, "w");
+        request->_tempFile = SPIFFS.open("/" + filename, "w");
     }
     if (len) {
         // stream the incoming chunk to the opened file
