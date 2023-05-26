@@ -17,7 +17,7 @@ const char AsyncFM_html[] PROGMEM = R"rawliteral(
 <meta charset="UTF-8">
 <link rel="icon" href="data:,">
 <script src="AsyncFM.js"></script>
-<style>body{font-family:monospace;font-size:120%;}</style>
+<style>body{font-family:monospace;font-size:1.2em;}</style>
 </head>
 <body>
 <h3>SPIFFS File Manager</h3>
