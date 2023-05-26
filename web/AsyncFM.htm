@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>File Manager</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="data:,">
+    <script src="AsyncFM.js"></script>
+    <style>
+        body {
+            font-family: monospace;
+            font-size: 120%;
+        }
+    </style>
+</head>
+
+<body>
+    <h3>SPIFFS File Manager</h3>
+    <p>Total: %TOTAL%</p>
+    <p>Used: %USED%</p>
+    <p>Free: %FREE%</p>
+    <button onclick="history.back()">Go Back</button>
+    <button onclick="getList()">List Files</button>
+    <button onclick="uploadButton()">Upload File</button>
+    <button onclick="format()">Format Filesystem</button>
+    <p id="status"></p>
+    <h3 id="header"></h3>
+    <p id="details"></p>
+</body>
+
+</html>
