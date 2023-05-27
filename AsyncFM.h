@@ -106,11 +106,21 @@ private:
     String _username = "";
     String _password = "";
     bool _authRequired = false;
+    static void format_task(void*);
     static String list();
     static String processor(const String& var);
     static String humanReadableSize(const size_t bytes);
     static void handleUpload(AsyncWebServerRequest* request, String filename, size_t index, uint8_t* data, size_t len, bool final);
 };
+
+void AsyncFMClass::format_task(void*)
+{
+    if (SPIFFS.format())
+        log_i("SPIFFS format complete");
+    else
+        log_e("Formatting SPIFFS failed!");
+    vTaskDelete(NULL);
+}
 
 void AsyncFMClass::begin(AsyncWebServer* server, const char* username, const char* password)
 {
@@ -141,16 +151,13 @@ void AsyncFMClass::begin(AsyncWebServer* server, const char* username, const cha
         request->send(response);
     });
 
-    _server->on(
-        "/fm_upload", HTTP_POST, [&](AsyncWebServerRequest* request) { request->send(200); }, handleUpload);
+    _server->on("/fm_upload", HTTP_POST, [&](AsyncWebServerRequest* request) { request->send(200); }, handleUpload);
 
     _server->on("/fm_list", HTTP_GET, [&](AsyncWebServerRequest* request) { request->send(200, "text/plain", list()); });
 
     _server->on("/fm_format", HTTP_GET, [&](AsyncWebServerRequest* request) {
-        if (SPIFFS.format())
-            request->send(200, "text/plain", "Format complete");
-        else
-            request->send(400, "text/plain", "ERROR: formatting failed!");
+        request->send(200, "text/plain", "Format in progress... wait 1 minute and refresh the page");
+        xTaskCreatePinnedToCore(format_task, "format_task", 8192, NULL, 0, NULL, 0);
     });
 
     _server->on("/fm_file", HTTP_GET, [&](AsyncWebServerRequest* request) {
