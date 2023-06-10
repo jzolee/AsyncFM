@@ -1,6 +1,6 @@
-function _(el) {
-    return document.getElementById(el);
-}
+const fm_evt = new EventSource("/fm_evt");
+function _(el) { return document.getElementById(el); }
+fm_evt.addEventListener("msg", (e) => { _("status").innerHTML = e.data; });
 function format() {
     if (confirm('WARNING, ALL DATA WILL BE LOST!\n Proceed with Format?') == true) {
         let a = new XMLHttpRequest();
@@ -58,8 +58,7 @@ function progressHandler(event) {
     let p = (event.loaded / event.total) * 100;
     _("progressBar").value = Math.round(p);
     _("status").innerHTML = Math.round(p) + "% uploaded... please wait";
-    if (p >= 100)
-        _("status").innerHTML = "Please wait, writing file to filesystem";
+    if (p >= 100) _("status").innerHTML = "Please wait, writing file to filesystem";
 }
 function onComplete(event) {
     _("status").innerHTML = "File Uploaded";
