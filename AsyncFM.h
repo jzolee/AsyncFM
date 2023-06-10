@@ -167,7 +167,7 @@ void AsyncFMClass::begin(AsyncWebServer* server, const char* username, const cha
 
     _server->on("/fm_format", HTTP_GET, [&](AsyncWebServerRequest* request) {
         request->send(200, "text/plain", "SPIFFS format in progress...");
-        xTaskCreatePinnedToCore(format_task, "format_task", 1024, NULL, 0, NULL, 0);
+        xTaskCreatePinnedToCore(format_task, "format_task", 8192, NULL, 0, NULL, 0);
     });
 
     _server->on("/fm_file", HTTP_GET, [&](AsyncWebServerRequest* request) {
